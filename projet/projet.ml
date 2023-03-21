@@ -1,10 +1,52 @@
-
 (* Produit matriciel avec les opérations de Strassen *)
-let rec strassenMultipleMatrix a b = 0;;
+let rec strassenMultipleMatrices firstMatrix secondMatrix =
+  let n = Array.length firstMatrix in
+  if n = 1 then
+    let result = Array.make_matrix 1 1 0 in
+    result.(0).(0) <- firstMatrix.(0).(0) * secondMatrix.(0).(0);
+    result
+  else
+    let a11, a12, a21, a22 = splitMatrix firstMatrix in
+    let b11, b12, b21, b22 = splitMatrix secondMatrix in
+    let s1 = strassenMultipleMatrices (addMatrices a11 a22) (addMatrices b11 b22) in
+    let s2 = strassenMultipleMatrices (addMatrices a21 a22) b11 in
+    let s3 = strassenMultipleMatrices a11 (subtractMatrices b12 b22) in
+    let s4 = strassenMultipleMatrices a22 (subtractMatrices b21 b11) in
+    let s5 = strassenMultipleMatrices (addMatrices a11 a12) b22 in
+    let s6 = strassenMultipleMatrices (subtractMatrices a21 a11) (addMatrices b11 b12) in
+    let s7 = strassenMultipleMatrices (subtractMatrices a12 a22) (addMatrices b21 b22) in
+    let c11 = addMatrices (subtractMatrices (addMatrices s1 s4) s5) s7 in
+    let c12 = addMatrices s3 s5 in
+    let c21 = addMatrices s2 s4 in
+    let c22 = addMatrices (subtractMatrices (addMatrices s1 s3) s2) s6 in
+    mergeMatrices c11 c12 c21 c22
 
+(* Fusionne les quatre sous-matrices en une matrice *)
+let mergeMatrices a11 a12 a21 a22 =
+  let matrixSize = Array.length a11 in
+  let result = Array.make_matrix (2 * matrixSize) (2 * matrixSize) 0 in
+  for x = 0 to matrixSize - 1 do
+    for y = 0 to matrixSize - 1 do
+      result.(x).(y) <- a11.(x).(y);
+      result.(x).(y + matrixSize) <- a12.(x).(y);
+      result.(x + matrixSize).(y) <- a21.(x).(y);
+      result.(x + matrixSize).(y + matrixSize) <- a22.(x).(y)
+    done;
+  done;
+  result
+
+(* Divise une matrice en quatre sous-matrices *)
+let splitMatrix matrix =
+  let matrixSize = Array.length matrix in
+  let subMatrixSize = matrixSize / 2 in
+  let a11 = subMatrix matrix 0 0 subMatrixSize in
+  let a12 = subMatrix matrix subMatrixSize 0 subMatrixSize in
+  let a21 = subMatrix matrix 0 subMatrixSize subMatrixSize in
+  let a22 = subMatrix matrix subMatrixSize subMatrixSize subMatrixSize in
+  a11, a12, a21, a22
 
 (* Produit matriciel ordinaire *)
-let multipleMatrix firstMatrix secondMatrix = 
+let multipleMatrices firstMatrix secondMatrix = 
   let rowLengthFirstMatrix = Array.length firstMatrix in
   let colsLengthSecondMatrix = Array.length secondMatrix.(0) in
   let colsLengthFirstMatrix = Array.length firstMatrix.(0) in 
@@ -19,7 +61,7 @@ let multipleMatrix firstMatrix secondMatrix =
   result
 
 (* Addition de deux matrices *)
-let rec addMatrix firstMatrix secondMatrix =
+let rec addMatrices firstMatrix secondMatrix =
   let matrixSize = Array.length firstMatrix in
   let result = Array.make_matrix matrixSize matrixSize 0 in
   for x = 0 to matrixSize - 1 do
@@ -30,7 +72,7 @@ let rec addMatrix firstMatrix secondMatrix =
   result
 
 (* Soustraction de deux matrices *)
-let rec subtractMatrix firstMatrix secondMatrix =
+let rec subtractMatrices firstMatrix secondMatrix =
   let matrixSize = Array.length firstMatrix in
   let result = Array.make_matrix matrixSize matrixSize 0 in
   for x = 0 to matrixSize - 1 do
@@ -85,6 +127,8 @@ let myFirstTransformedMatrix = transformMatrix(myFirstMatrix);;
 let mySecondMatrix = createMatrix(3);;
 let mySecondTransformedMatrix = transformMatrix(mySecondMatrix);;
 
-let myMultipledMatrix = multipleMatrix myFirstTransformedMatrix mySecondTransformedMatrix;;
+let myMultipledMatrix = multipleMatrices myFirstTransformedMatrix mySecondTransformedMatrix;;
 
 let mySubMatrix = subMatrix myFirstMatrix 0 0 2;;
+
+let myStrassenMultipledMatrix = strassenMultipleMatrices myFirstTransformedMatrix mySecondTransformedMatrix;;
