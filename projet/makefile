@@ -1,8 +1,8 @@
-﻿# Nom de l'exécutable
-EXECUTABLE = projet
+﻿compile: clean
+	ocamlc -o projet projet.ml
 
-compile:
-	ocamlc -o projet.ml projet
+run: compile
+	./projet
 
 clean:
-	rm -f *.cmi *.cmo
+	rm -f *.cmi *.cmo projet	
