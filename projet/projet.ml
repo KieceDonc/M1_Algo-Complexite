@@ -12,6 +12,14 @@ let printMatrix matrix =
     print_string "\n";
   done;;
 
+(* Crée la matrice identité *)
+let createIdentityMatrix matrixSize =
+  let identityMatrix = Array.make_matrix matrixSize matrixSize 0 in
+  for x = 0 to matrixSize - 1 do
+    identityMatrix.(x).(x) <- 1;
+  done;
+  identityMatrix;;
+
 (* Crée une matrice contenant des valeurs de 0 à 9 avec une taille donnée *)
 let createMatrix size =
   let matrix = Array.make_matrix size size 0 in
@@ -91,6 +99,16 @@ let multipleMatrices firstMatrix secondMatrix =
   done;
   result
 
+let multipleMatricesByConstant matrix constant = 
+  let matrixSize = Array.length matrix in
+  let result = Array.make_matrix matrixSize matrixSize 0 in
+  for x = 0 to matrixSize - 1 do
+    for y = 0 to matrixSize - 1 do
+      result.(x).(y) <- (matrix.(x).(y) * constant)
+    done;
+  done;
+  result
+
 (* Addition de deux matrices *)
 let rec addMatrices firstMatrix secondMatrix =
   let matrixSize = Array.length firstMatrix in
@@ -115,8 +133,8 @@ let rec subtractMatrices firstMatrix secondMatrix =
 
 (* Produit matriciel avec les opérations de Strassen *)
 let rec strassenMultipleMatrices firstMatrix secondMatrix =
-  let n = Array.length firstMatrix in
-  if n = 1 then
+  let matrixSize = Array.length firstMatrix in
+  if matrixSize = 1 then
     let result = Array.make_matrix 1 1 0 in
     result.(0).(0) <- firstMatrix.(0).(0) * secondMatrix.(0).(0);
     result
@@ -136,18 +154,47 @@ let rec strassenMultipleMatrices firstMatrix secondMatrix =
     let c22 = addMatrices (subtractMatrices (addMatrices s1 s3) s2) s6 in
     mergeMatrices c11 c12 c21 c22
 
-let myFirstMatrix = createMatrix(3);;
+(* Fonction pour renvoyer la transposée d'une matrice *)
+let transposeMatrix matrix =
+  let matrixSize = Array.length matrix in
+  let transposedMatrix = Array.make_matrix matrixSize matrixSize 0 in
+  for x = 0 to matrixSize - 1 do
+    for y = 0 to matrixSize - 1 do
+      transposedMatrix.(x).(y) <- matrix.(y).(x)
+    done;
+  done;
+  transposedMatrix
+
+(* Retourne l'inverse d'une matrice *)
+(* https://sd.blackball.lv/library/Introduction_to_Algorithms_Third_Edition_(2009).pdf *)
+(* Page 830 *)
+(* https://www.sciencedirect.com/science/article/pii/S0377042708006237#b5 *)
+let rec inverseMatrix matrix =
+  let matrixSize = Array.length matrix in
+  if matrixSize = 1 then
+    let result = Array.make_matrix 1 1 0 in
+    result.(0).(0) <- (1/matrix.(0).(0));
+    result
+  else
+    let a11, a12, a21, a22 = splitMatrix matrix in
+    let r1 = transposeMatrix a11 in
+    let r2 = strassenMultipleMatrices a21 r1 in
+    let r3 = strassenMultipleMatrices r1 a12 in
+    let r4 = strassenMultipleMatrices a21 r3 in
+    let r5 = subtractMatrices r4 a22 in
+    let r6 = transposeMatrix r5 in
+    let x12 = strassenMultipleMatrices r3 r6 in
+    let x21 = strassenMultipleMatrices r6 r2 in
+    let r7 = strassenMultipleMatrices r3 x21 in
+    let x11 = subtractMatrices r1 r7 in
+    let x22 = multipleMatricesByConstant r6 (-1) in
+    printMatrix x12;
+    mergeMatrices x11 x12 x21 x22
+  
+let myFirstMatrix = transformMatrix(createMatrix(4));;
 printMatrix myFirstMatrix;;
-let myFirstTransformedMatrix = transformMatrix(myFirstMatrix);;
-printMatrix myFirstTransformedMatrix;;
 
-let mySecondMatrix = createMatrix(3);;
+let mySecondMatrix = transformMatrix(createMatrix(4));;
 printMatrix mySecondMatrix;;
-let mySecondTransformedMatrix = transformMatrix(mySecondMatrix);;
-printMatrix mySecondTransformedMatrix;;
 
-let myMultipledMatrix = multipleMatrices myFirstTransformedMatrix mySecondTransformedMatrix;;
-printMatrix myMultipledMatrix;;
-
-let myStrassenMultipledMatrix = strassenMultipleMatrices myFirstTransformedMatrix mySecondTransformedMatrix;;
-printMatrix myStrassenMultipledMatrix;;
+let myInvertMatrix = inverseMatrix myFirstMatrix;;
