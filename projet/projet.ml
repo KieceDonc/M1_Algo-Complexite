@@ -12,6 +12,17 @@ let printMatrix matrix =
     print_string "\n";
   done;;
 
+(* Fonction pour renvoyer la transposée d'une matrice *)
+let transposeMatrix matrix =
+  let matrixSize = Array.length matrix in
+  let transposedMatrix = Array.make_matrix matrixSize matrixSize 0 in
+  for x = 0 to matrixSize - 1 do
+    for y = 0 to matrixSize - 1 do
+      transposedMatrix.(x).(y) <- matrix.(y).(x)
+    done;
+  done;
+  transposedMatrix
+
 (* Crée la matrice identité *)
 let createIdentityMatrix matrixSize =
   let identityMatrix = Array.make_matrix matrixSize matrixSize 0 in
@@ -31,6 +42,25 @@ let createMatrix size =
   done;
 
   matrix
+
+(* 
+  Crée une matrice de la forme A = B Ct  
+                                   C D 
+
+  Ct étant la transposé de C
+*)
+let createSpecialMatrice matrixSize =
+  let matrixSize = Array.length a11 in
+  let result = Array.make_matrix (2 * matrixSize) (2 * matrixSize) 0 in
+  for x = 0 to matrixSize - 1 do
+    for y = 0 to matrixSize - 1 do
+      result.(x).(y) <- a11.(x).(y);
+      result.(x).(y + matrixSize) <- a12.(x).(y);
+      result.(x + matrixSize).(y) <- a21.(x).(y);
+      result.(x + matrixSize).(y + matrixSize) <- a22.(x).(y)
+    done;
+  done;
+  result
 
 (* Transforme une matrice avec une taille étant une puissance de 2. Complète les nouvelles valeurs avec un 0 *)
 let transformMatrix matrix = 
@@ -60,6 +90,16 @@ let subMatrix matrix topLeftx topLefty length =
   done;
   sub
 
+(* Divise une matrice en quatre sous-matrices *)
+let splitMatrix matrix =
+  let matrixSize = Array.length matrix in
+  let subMatrixSize = matrixSize / 2 in
+  let a11 = subMatrix matrix 0 0 subMatrixSize in
+  let a12 = subMatrix matrix subMatrixSize 0 subMatrixSize in
+  let a21 = subMatrix matrix 0 subMatrixSize subMatrixSize in
+  let a22 = subMatrix matrix subMatrixSize subMatrixSize subMatrixSize in
+  a11, a12, a21, a22
+
 (* Fusionne les quatre sous-matrices en une matrice *)
 let mergeMatrices a11 a12 a21 a22 =
   let matrixSize = Array.length a11 in
@@ -73,16 +113,6 @@ let mergeMatrices a11 a12 a21 a22 =
     done;
   done;
   result
-
-(* Divise une matrice en quatre sous-matrices *)
-let splitMatrix matrix =
-  let matrixSize = Array.length matrix in
-  let subMatrixSize = matrixSize / 2 in
-  let a11 = subMatrix matrix 0 0 subMatrixSize in
-  let a12 = subMatrix matrix subMatrixSize 0 subMatrixSize in
-  let a21 = subMatrix matrix 0 subMatrixSize subMatrixSize in
-  let a22 = subMatrix matrix subMatrixSize subMatrixSize subMatrixSize in
-  a11, a12, a21, a22
 
 (* Produit matriciel ordinaire *)
 let multipleMatrices firstMatrix secondMatrix = 
@@ -153,17 +183,6 @@ let rec strassenMultipleMatrices firstMatrix secondMatrix =
     let c21 = addMatrices s2 s4 in
     let c22 = addMatrices (subtractMatrices (addMatrices s1 s3) s2) s6 in
     mergeMatrices c11 c12 c21 c22
-
-(* Fonction pour renvoyer la transposée d'une matrice *)
-let transposeMatrix matrix =
-  let matrixSize = Array.length matrix in
-  let transposedMatrix = Array.make_matrix matrixSize matrixSize 0 in
-  for x = 0 to matrixSize - 1 do
-    for y = 0 to matrixSize - 1 do
-      transposedMatrix.(x).(y) <- matrix.(y).(x)
-    done;
-  done;
-  transposedMatrix
 
 (* Retourne l'inverse d'une matrice *)
 (* https://sd.blackball.lv/library/Introduction_to_Algorithms_Third_Edition_(2009).pdf *)
