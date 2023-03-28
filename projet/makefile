@@ -1,8 +1,12 @@
-﻿compile: clean
-	ocamlc -o projet projet.ml
+﻿OUTPUT = projet
+FILE = $(OUTPUT).ml
+MATRIX_FILE = matrix.ml
+
+compile: clean
+	ocamlc -o $(OUTPUT) $(MATRIX_FILE) $(FILE)
 
 run: compile
-	./projet
+	./$(OUTPUT)
 
 clean:
-	rm -f *.cmi *.cmo projet	
+	rm -f *.cmi *.cmo $(OUTPUT)
