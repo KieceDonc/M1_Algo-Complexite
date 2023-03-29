@@ -12,40 +12,29 @@ module Matrix = struct
             done;
             print_string "\n";
         done;;
-
-    let createIdentityTest matrixSize = 
+    (* Crée la matrice identité *)
+    let createIdentity matrixSize = 
         let rec create matrix x y =
-            if x = y then
-                matrix.(x).(y) <- 1.0;
-            else if x = matrixSize - 1 then
-                if y = matrixSize - 1 then
-                    matrix
-                else
-                    create matrix x (y+1)
-            else
-                create matrix (x+1) y
+            matrix.(x).(y) <- 1.0;
+            if x = matrixSize - 1 && y = matrixSize - 1 then
+                matrix
+            else 
+                create matrix (x+1) (y+1)
         in
         create (Array.make_matrix matrixSize matrixSize 0.0) 0 0
-
-    (* Crée la matrice identité *)
-    let createIdentity matrixSize =
-        let identityMatrix = Array.make_matrix matrixSize matrixSize 0.0 in
-        for x = 0 to matrixSize - 1 do
-            identityMatrix.(x).(x) <- 1.0;
-        done;
-        identityMatrix
-
+    
     (* Crée une matrice contenant des valeurs de 0 à 9 avec une taille donnée *)
-    let create size =
-        let matrix = Array.make_matrix size size 0.0 in
-        
-        for x = 0 to size - 1 do
-            for y = 0 to size - 1 do
-            matrix.(x).(y) <- float_of_int (Random.int 10)
-            done;
-        done;
-
-        matrix
+    let create matrixSize =
+        let rec create matrix x y =
+            matrix.(x).(y) <- float_of_int (Random.int 10);
+            if x = matrixSize - 1 && y = matrixSize - 1 then
+                matrix
+            else if y = matrixSize - 1 then
+                create matrix (x+1) 0
+            else
+                create matrix x (y+1)
+        in
+        create (Array.make_matrix matrixSize matrixSize 0.0) 0 0
     
     (* Fonction pour renvoyer la transposée d'une matrice *)
     let transpose matrix =

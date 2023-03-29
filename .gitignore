@@ -1,5 +1,4 @@
 ﻿*.cmi 
 *.cmo
-projet.*
 projet/recursif/projet
 projet/iteratif/projet
