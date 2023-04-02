@@ -12,6 +12,7 @@ module Matrix = struct
             done;
             print_string "\n";
         done;;
+
     (* Crée la matrice identité *)
     let createIdentity matrixSize = 
         let rec create matrix x y =
@@ -35,17 +36,21 @@ module Matrix = struct
                 create matrix x (y+1)
         in
         create (Array.make_matrix matrixSize matrixSize 0.0) 0 0
-    
+
     (* Fonction pour renvoyer la transposée d'une matrice *)
-    let transpose matrix =
+    let transpose matrix = 
         let matrixSize = Array.length matrix in
-        let transposedMatrix = Array.make_matrix matrixSize matrixSize 0.0 in
-        for x = 0 to matrixSize - 1 do
-            for y = 0 to matrixSize - 1 do
-            transposedMatrix.(x).(y) <- matrix.(y).(x)
-            done;
-        done;
-        transposedMatrix
+        let finaMatrix = Array.make_matrix matrixSize matrixSize 0.0 in
+        let rec transpose x y = 
+          finaMatrix.(y).(x) <- matrix.(x).(y);
+          if x = matrixSize - 1 && y = matrixSize - 1 then
+            finaMatrix
+          else if y = matrixSize - 1 then
+            transpose (x+1) 0
+          else
+            transpose x (y+1)
+        in
+        transpose 0 0
 
     (* Transforme une matrice avec une taille étant une puissance de 2. Complète les nouvelles valeurs avec un 0 *)
     let transform matrix = 
@@ -68,6 +73,9 @@ module Matrix = struct
     (* 
     Crée une matrice de la forme A = B Ct  
                                     C D 
+                                    C D 
+
+                                     C D 
 
     Ct étant la transposé de C
     *)
