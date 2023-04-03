@@ -14,28 +14,18 @@ module Matrix = struct
         done;;
 
     (* Crée la matrice identité *)
-    let createIdentity matrixSize = 
-        let rec create matrix x y =
-            matrix.(x).(y) <- 1.0;
-            if x = matrixSize - 1 && y = matrixSize - 1 then
-                matrix
-            else 
-                create matrix (x+1) (y+1)
-        in
-        create (Array.make_matrix matrixSize matrixSize 0.0) 0 0
+    let createIdentity matrixSize =
+        Array.fold_left
+          (fun acc x -> acc.(x) <- Array.make matrixSize 0.0; acc.(x).(x) <- 1.0; acc)
+          (Array.make_matrix matrixSize matrixSize 0.0)
+          (Array.init matrixSize (fun x -> x))
     
     (* Crée une matrice contenant des valeurs de 0 à 9 avec une taille donnée *)
     let create matrixSize =
-        let rec create matrix x y =
-            matrix.(x).(y) <- float_of_int (Random.int 10);
-            if x = matrixSize - 1 && y = matrixSize - 1 then
-                matrix
-            else if y = matrixSize - 1 then
-                create matrix (x+1) 0
-            else
-                create matrix x (y+1)
-        in
-        create (Array.make_matrix matrixSize matrixSize 0.0) 0 0
+        Array.fold_left
+            (fun acc x -> acc.(x) <- Array.init matrixSize (fun _ -> float_of_int (Random.int 10)); acc)
+            (Array.make_matrix matrixSize matrixSize 0.0)
+            (Array.init matrixSize (fun x -> x))
 
     (* Fonction pour renvoyer la transposée d'une matrice *)
     let transpose matrix = 
