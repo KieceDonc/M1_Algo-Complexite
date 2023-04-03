@@ -30,36 +30,20 @@ module Matrix = struct
     (* Fonction pour renvoyer la transposée d'une matrice *)
     let transpose matrix = 
         let matrixSize = Array.length matrix in
-        let finaMatrix = Array.make_matrix matrixSize matrixSize 0.0 in
-        let rec transpose x y = 
-          finaMatrix.(y).(x) <- matrix.(x).(y);
-          if x = matrixSize - 1 && y = matrixSize - 1 then
-            finaMatrix
-          else if y = matrixSize - 1 then
-            transpose (x+1) 0
-          else
-            transpose x (y+1)
-        in
-        transpose 0 0
+        Array.fold_left
+            (fun acc (x,y) -> acc.(x).(y) <- matrix.(y).(x); acc)
+            (Array.make_matrix matrixSize matrixSize 0.0)
+            (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Transforme une matrice avec une taille étant une puissance de 2. Complète les nouvelles valeurs avec un 0 *)
     let transform matrix = 
         let inputSize = Array.length matrix in
         let finalSize = int_of_float(2. ** ceil(log(float_of_int inputSize) /. log(2.0))) in (*Recherche la puissance de 2 supérieur la plus proche*)
+        Array.fold_left
+            (fun acc (x,y) -> acc.(x).(y) <- matrix.(x).(y); acc)
+            (Array.make_matrix finalSize finalSize 0.0)
+            (Array.init (inputSize * inputSize) (fun x -> (x / inputSize, x mod inputSize)))
         
-        let finalMatrix = Array.make_matrix finalSize finalSize 0.0 in
-
-        for x = 0 to finalSize - 1 do
-            for y = 0 to finalSize - 1 do
-            if x < inputSize && y < inputSize then
-                finalMatrix.(x).(y) <- matrix.(x).(y)
-            else
-                finalMatrix.(x).(y) <- 0.0
-            done;
-        done;
-
-        finalMatrix
-
     (* 
     Crée une matrice de la forme A = B Ct  
                                     C D 
@@ -70,31 +54,19 @@ module Matrix = struct
     Ct étant la transposé de C
     *)
     let createSpecial matrixSize =
+        let matrix = create matrixSize in
         let subMatrixSize = matrixSize / 2 in
-        let result = Array.make_matrix matrixSize matrixSize 0.0 in
-        let b = create subMatrixSize in
-        let c = create subMatrixSize in
-        let d = create subMatrixSize in
-        let ct = transpose c in
-        for x = 0 to subMatrixSize - 1 do
-            for y = 0 to subMatrixSize - 1 do
-            result.(x).(y) <- b.(x).(y);
-            result.(x).(y + subMatrixSize) <- ct.(x).(y);
-            result.(x + subMatrixSize).(y) <- c.(x).(y);
-            result.(x + subMatrixSize).(y + subMatrixSize) <- d.(x).(y)
-            done;
-        done;
-        transform result
+        Array.fold_left
+            (fun acc (x,y) -> acc.(x + subMatrixSize).(y) <- matrix.(x).(y + subMatrixSize); acc)
+            matrix
+            (Array.init (subMatrixSize * subMatrixSize) (fun x -> (x / subMatrixSize, x mod subMatrixSize)))
 
     (* Fonction permettant d'extraire une sous-matrice d'une matrice donnée *)
     let sub matrix topLeftx topLefty length =
-        let sub = Array.make_matrix length length 0.0 in
-        for x = 0 to length - 1 do
-            for y = 0 to length - 1 do
-                sub.(x).(y) <- matrix.(topLefty+x).(topLeftx+y)
-            done;
-        done;
-        sub
+        Array.fold_left
+            (fun acc (x,y) -> acc.(x).(y) <- matrix.(topLeftx + x).(topLefty + y); acc)
+            (Array.make_matrix length length 0.0)
+            (Array.init (length * length) (fun x -> (x / length, x mod length)))
 
     (* Divise une matrice en quatre sous-matrices *)
     let split matrix =
@@ -106,13 +78,11 @@ module Matrix = struct
         let a22 = sub matrix subMatrixSize subMatrixSize subMatrixSize in
         a11, a12, a21, a22
 
+    (* Multiplie une matrice par une constante *)
     let multipleByConstant matrix constant = 
         let matrixSize = Array.length matrix in
-        let result = Array.make_matrix matrixSize matrixSize 0.0 in
-        for x = 0 to matrixSize - 1 do
-            for y = 0 to matrixSize - 1 do
-                result.(x).(y) <- (matrix.(x).(y) *. constant)
-            done;
-        done;
-        result
+        Array.fold_left
+            (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) *. constant; acc)
+            matrix
+            (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 end
