@@ -33,16 +33,16 @@
     let add firstMatrix secondMatrix =
       let matrixSize = Array.length firstMatrix in
       Array.fold_left
-        (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) +. secondMatrix.(x).(y); acc)
-        firstMatrix
+        (fun acc (x,y) -> acc.(x).(y) <- firstMatrix.(x).(y) +. secondMatrix.(x).(y); acc)
+        (Array.make_matrix matrixSize  matrixSize 0.0)
         (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Soustraction de deux matrices *)
     let rec subtract firstMatrix secondMatrix =
       let matrixSize = Array.length firstMatrix in
       Array.fold_left
-        (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) -. secondMatrix.(x).(y); acc)
-        firstMatrix
+        (fun acc (x,y) -> acc.(x).(y) <- firstMatrix.(x).(y) -. secondMatrix.(x).(y); acc)
+        (Array.make_matrix matrixSize  matrixSize 0.0)
         (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Produit matriciel avec les opérations de Strassen *)

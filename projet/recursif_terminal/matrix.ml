@@ -73,8 +73,8 @@ module Matrix = struct
         let matrixSize = Array.length matrix in
         let subMatrixSize = matrixSize / 2 in
         let a11 = sub matrix 0 0 subMatrixSize in
-        let a12 = sub matrix subMatrixSize 0 subMatrixSize in
-        let a21 = sub matrix 0 subMatrixSize subMatrixSize in
+        let a12 = sub matrix 0 subMatrixSize subMatrixSize in
+        let a21 = sub matrix subMatrixSize 0 subMatrixSize in
         let a22 = sub matrix subMatrixSize subMatrixSize subMatrixSize in
         a11, a12, a21, a22
 
@@ -83,6 +83,6 @@ module Matrix = struct
         let matrixSize = Array.length matrix in
         Array.fold_left
             (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) *. constant; acc)
-            matrix
+            (Array.make_matrix matrixSize  matrixSize 0.0)
             (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 end
