@@ -4,16 +4,15 @@
     (* Fusionne les quatre sous-matrices en une matrice *)
     let merge a11 a12 a21 a22 =
       let matrixSize = Array.length a11 in
-      let result = Array.make_matrix (2 * matrixSize) (2 * matrixSize) 0.0 in
-      for x = 0 to matrixSize - 1 do
-        for y = 0 to matrixSize - 1 do
-          result.(x).(y) <- a11.(x).(y);
-          result.(x).(y + matrixSize) <- a12.(x).(y);
-          result.(x + matrixSize).(y) <- a21.(x).(y);
-          result.(x + matrixSize).(y + matrixSize) <- a22.(x).(y);
-        done;
-      done;
-      result
+      Array.fold_left
+        (fun acc (x,y) -> 
+          acc.(x).(y) <- a11.(x).(y);
+          acc.(x).(y + matrixSize) <- a12.(x).(y);
+          acc.(x + matrixSize).(y) <- a21.(x).(y);
+          acc.(x + matrixSize).(y + matrixSize) <- a22.(x).(y);
+          acc)
+        (Array.make_matrix (2 * matrixSize) (2 * matrixSize) 0.0)
+        (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Produit matriciel ordinaire *)
     let multiple firstMatrix secondMatrix = 
@@ -33,24 +32,18 @@
     (* Addition de deux matrices *)
     let add firstMatrix secondMatrix =
       let matrixSize = Array.length firstMatrix in
-      let result = Array.make_matrix matrixSize matrixSize 0.0 in
-      for x = 0 to matrixSize - 1 do
-        for y = 0 to matrixSize - 1 do
-          result.(x).(y) <- firstMatrix.(x).(y) +. secondMatrix.(x).(y)
-        done;
-      done;
-      result
+      Array.fold_left
+        (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) +. secondMatrix.(x).(y); acc)
+        firstMatrix
+        (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Soustraction de deux matrices *)
     let rec subtract firstMatrix secondMatrix =
       let matrixSize = Array.length firstMatrix in
-      let result = Array.make_matrix matrixSize matrixSize 0.0 in
-      for x = 0 to matrixSize - 1 do
-        for y = 0 to matrixSize - 1 do
-          result.(x).(y) <- firstMatrix.(x).(y) -. secondMatrix.(x).(y)
-        done;
-      done;
-      result
+      Array.fold_left
+        (fun acc (x,y) -> acc.(x).(y) <- acc.(x).(y) -. secondMatrix.(x).(y); acc)
+        firstMatrix
+        (Array.init (matrixSize * matrixSize) (fun x -> (x / matrixSize, x mod matrixSize)))
 
     (* Produit matriciel avec les opérations de Strassen *)
     let rec strassenMultiple firstMatrix secondMatrix =
