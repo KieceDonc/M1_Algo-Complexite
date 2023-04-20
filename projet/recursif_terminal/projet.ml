@@ -32,6 +32,8 @@ Matrix.print approxIdentityMatrix;;
 let identityMatrix = Matrix.createIdentity matrixSize;;
 
 let diffMatrix = Matrices.subtract approxIdentityMatrix identityMatrix;;
+
+(* Fonction de somme des valeurs absolue d'une matrice*)
 let totalDiff = Array.fold_left
   (fun acc (x,y) -> acc +. abs_float (diffMatrix.(x).(y)))
   0.0
@@ -39,6 +41,7 @@ let totalDiff = Array.fold_left
 print_float totalDiff;;
 Printf.printf "\n";;
 
+(* Fonction de somme des valeurs d'une matrice*)
 let totalDiff = Array.fold_left
   (fun acc (x,y) -> acc +. diffMatrix.(x).(y))
   0.0

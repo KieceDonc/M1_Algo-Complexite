@@ -6,7 +6,7 @@ MATRICES_FILE = matrices.ml
 compile: clean
 	ocamlc -o $(OUTPUT) $(MATRIX_FILE) $(MATRICES_FILE) $(FILE)
 
-run: compile
+all: compile
 	./$(OUTPUT)
 
 clean:
